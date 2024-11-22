@@ -20,15 +20,14 @@ public class JwtService {
 
 
     public String generateToken(String username) {
-        Map<String, Object> claims = new HashMap<>();
-        return createToken(claims, username);
+        return generateToken(new HashMap<>(), username);
     }
-    private String createToken(Map<String, Object> claims, String subject) {
+    public String generateToken(Map<String, Object> claims, String subject) {
         return Jwts.builder()
                 .setClaims(claims)
                 .setSubject(subject)
                 .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 10))
+                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 10)) // 10 heures
                 .signWith(getSigningKey(), SignatureAlgorithm.HS256)
                 .compact();
     }
@@ -47,7 +46,7 @@ public class JwtService {
 
 
 
-    private <T> T extractClaim(String token, Function<Map<String, Object>, T> claimsResolver) {
+    public <T> T extractClaim(String token, Function<Map<String, Object>, T> claimsResolver) {
         final Map<String, Object> claims = Jwts.parserBuilder().setSigningKey(getSigningKey()).build().parseClaimsJws(token).getBody();
         return claimsResolver.apply(claims);
     }
